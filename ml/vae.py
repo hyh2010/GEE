@@ -27,7 +27,12 @@ class VAE(pl.LightningModule):
         return BCE + KLD
 
     def training_step(self, batch, batch_idx):
+
         x = batch['feature']
+        if (self.global_step == 1):
+            #  add computation graph
+            self.logger.experiment.add_graph(self, x)
+
         recon_x, mu, logvar = self(x)
         loss = self.loss_function(recon_x, x, mu, logvar)
 
@@ -40,8 +45,8 @@ class VAE(pl.LightningModule):
        avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
 
        # calculating correect and total predictions
-       correct=sum([x["correct"] for  x in outputs])
-       total=sum([x["total"] for  x in outputs])
+       #correct=sum([x["correct"] for  x in outputs])
+       #total=sum([x["total"] for  x in outputs])
 
        # logging using tensorboard logger
        self.logger.experiment.add_scalar("Loss/Train",
