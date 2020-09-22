@@ -6,8 +6,14 @@ import psutil
 from petastorm import make_reader
 from petastorm.pytorch import DataLoader
 from pytorch_lightning import Trainer
+from pytorch_lightning import loggers as pl_loggers
 
 from ml.vae import VAE
+
+from torch.utils.tensorboard import SummaryWriter
+import pathlib
+import shutil
+import tempfile
 
 
 @click.command()
@@ -26,6 +32,13 @@ def main(data_path: str, model_path: str, gpu: bool):
     logger.setLevel('INFO')
 
     logger.info('Initialise data loader...')
+
+    # create tensorboard logdir
+    #logdir = pathlib.Path(tempfile.mkdtemp())/"tensorboard_logs"
+    #shutil.rmtree(logdir, ignore_errors=True)
+    logdir = pathlib.Path('/tmp/tmpedfqsh54/tensorboard_logs')/"tensorboard_logs"
+    logger.info('Tensorboard dir: %s' % logdir) 
+
     # get number of cores
     num_cores = psutil.cpu_count(logical=True)
     # load data loader
@@ -40,9 +53,22 @@ def main(data_path: str, model_path: str, gpu: bool):
     # init model
     model = VAE()
 
+    logdir_vae = logdir/'vae'
+
+    #data = next(iter(dataloader))
+
+
+    #writer = SummaryWriter(logdir/'vae')
+    #writer.add_graph(model, data['feature'])
+    #writer.close()
+
     logger.info('Start Training...')
+
+    tb_logger = pl_loggers.TensorBoardLogger(str(logdir))
+
     # train
-    trainer = Trainer(val_check_interval=100, max_epochs=50, gpus=gpu)
+    trainer = Trainer(val_check_interval=100, max_epochs=50, gpus=gpu, logger=tb_logger)
+
     trainer.fit(model, dataloader)
 
     logger.info('Persisting...')
