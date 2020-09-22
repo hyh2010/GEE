@@ -33,6 +33,31 @@ class VAE(pl.LightningModule):
 
         return {'loss': loss}
 
+    def training_epoch_end(self, outputs):
+       #  the function is called after every epoch is completed
+
+       # calculating average loss  
+       avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
+
+       # calculating correect and total predictions
+       correct=sum([x["correct"] for  x in outputs])
+       total=sum([x["total"] for  x in outputs])
+
+       # logging using tensorboard logger
+       self.logger.experiment.add_scalar("Loss/Train",
+                                           avg_loss,
+                                           self.current_epoch)
+       
+       #self.logger.experiment.add_scalar("Accuracy/Train",
+                                           #correct/total,
+                                           #self.current_epoch)
+
+       epoch_dictionary={
+           # required
+           'loss': avg_loss}
+
+       return epoch_dictionary
+
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.001, weight_decay=0.01)
 

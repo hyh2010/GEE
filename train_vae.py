@@ -15,7 +15,6 @@ import pathlib
 import shutil
 import tempfile
 
-
 @click.command()
 @click.option('-d', '--data_path', help='dir path containing model input parquet files', required=True)
 @click.option('-m', '--model_path', help='output model path', required=True)
@@ -64,7 +63,7 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Start Training...')
 
-    tb_logger = pl_loggers.TensorBoardLogger(str(logdir))
+    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name='vae')
 
     # train
     trainer = Trainer(val_check_interval=100, max_epochs=50, gpus=gpu, logger=tb_logger)
