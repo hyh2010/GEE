@@ -9,6 +9,7 @@ from pytorch_lightning import Trainer
 from pytorch_lightning import loggers as pl_loggers
 
 from ml.vae import VAE
+from ml.ae import AE
 
 from torch.utils.tensorboard import SummaryWriter
 import pathlib
@@ -50,7 +51,8 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Initialise model...')
     # init model
-    model = VAE()
+    #model = VAE()
+    model = AE()
 
     logdir_vae = logdir/'vae'
 
@@ -63,7 +65,7 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Start Training...')
 
-    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name='vae')
+    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name='vae_mse_no_sigmoid')
 
     # train
     trainer = Trainer(val_check_interval=100, max_epochs=50, gpus=gpu, logger=tb_logger)
