@@ -65,7 +65,7 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Start Training...')
 
-    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name='vae_mse_no_sigmoid')
+    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name='vae_mse_no_sigmoid_run2')
 
     # train
     trainer = Trainer(val_check_interval=100, max_epochs=50, gpus=gpu, logger=tb_logger)
