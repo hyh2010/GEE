@@ -120,32 +120,37 @@ class FeatureExtractor:
         """
 
         common_port = {
-            20: 0,  # FTP
-            21: 1,  # FTP
-            22: 2,  # SSH
-            23: 3,  # Telnet
-            25: 4,  # SMTP
-            50: 5,  # IPSec
-            51: 6,  # IPSec
-            53: 7,  # DNS
-            67: 8,  # DHCP
-            68: 9,  # DHCP
-            69: 10,  # TFTP
-            80: 11,  # HTTP
-            110: 12,  # POP3
-            119: 13,  # NNTP
-            123: 14,  # NTP
-            135: 15,  # RPC
-            136: 16,  # NetBios
-            137: 17,  # NetBios
-            138: 18,  # NetBios
-            139: 19,  # NetBios
-            143: 20,  # IMAP
-            161: 21,  # SNMP
-            162: 22,  # SNMP
-            389: 23,  # LDAP
-            443: 24,  # HTTPS
-            3389: 25,  # RDP
+            0: 0, # Other
+            20: 1,  # FTP
+            21: 2,  # FTP
+            22: 3,  # SSH
+            23: 4,  # Telnet
+            25: 5,  # SMTP
+            50: 6,  # IPSec
+            51: 7,  # IPSec
+            53: 8,  # DNS
+            67: 9,  # DHCP
+            68: 10,  # DHCP
+            69: 11,  # TFTP
+            80: 12,  # HTTP
+            110: 13,  # POP3
+            119: 14,  # NNTP
+            123: 15,  # NTP
+            135: 16,  # RPC
+            136: 17,  # NetBios
+            137: 18,  # NetBios
+            138: 19,  # NetBios
+            139: 20,  # NetBios
+            143: 21,  # IMAP
+            161: 22,  # SNMP
+            162: 23,  # SNMP
+            179: 24, # BGP
+            389: 25,  # LDAP
+            443: 26,  # HTTPS
+            445: 27, # Microsoft-DS
+            530: 28, # WinRPC
+            995: 29, #POP3S
+            3389: 30,  # RDP
         }
 
         proportion = [0.0] * (len(common_port) + 1)
