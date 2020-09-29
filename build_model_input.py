@@ -17,8 +17,10 @@ class FeatureComposer:
         self.spark = spark
         self.df = df
         self.feature_column = (
-            'mean_duration', 'mean_packet', 'mean_num_of_bytes', 'mean_packet_rate', 'mean_byte_rate', 'std_duration',
-            'std_packet', 'std_num_of_bytes', 'std_packet_rate', 'std_byte_rate', 'entropy_protocol', 'entropy_dst_ip',
+            'mean_duration', 'mean_packet', 'mean_num_of_bytes',
+            #'mean_packet_rate', 'mean_byte_rate',
+            'std_duration', 'std_packet', 'std_num_of_bytes', #'std_packet_rate', 'std_byte_rate',
+            'entropy_protocol', 'entropy_dst_ip',
             'entropy_src_port', 'entropy_dst_port', 'entropy_flags', 'proportion_src_port', 'proportion_dst_port',
         )
 
@@ -26,9 +28,11 @@ class FeatureComposer:
 
     @staticmethod
     def feature_compose(
-            mean_duration: float, mean_packet: float, mean_num_of_bytes: float, mean_packet_rate: float,
-            mean_byte_rate: float, std_duration: float, std_packet: float, std_num_of_bytes: float,
-            std_packet_rate: float, std_byte_rate: float, entropy_protocol: float, entropy_dst_ip: float,
+            mean_duration: float, mean_packet: float, mean_num_of_bytes: float, #mean_packet_rate: float,
+            #mean_byte_rate: float, 
+            std_duration: float, std_packet: float, std_num_of_bytes: float,
+            #std_packet_rate: float, std_byte_rate: float,
+            entropy_protocol: float, entropy_dst_ip: float,
             entropy_src_port: float, entropy_dst_port: float, entropy_flags: float, proportion_src_port: list,
             proportion_dst_port: list
     ) -> list:
@@ -37,13 +41,13 @@ class FeatureComposer:
         :param mean_duration: mean duration
         :param mean_packet: mean packet
         :param mean_num_of_bytes: mean number of bytes
-        :param mean_packet_rate: mean packet rate
-        :param mean_byte_rate: mean byte rate
+        #:param mean_packet_rate: mean packet rate
+        #:param mean_byte_rate: mean byte rate
         :param std_duration: std duration
         :param std_packet: std packet
         :param std_num_of_bytes: std number of bytes
-        :param std_packet_rate: std packet rate
-        :param std_byte_rate: std byte rate
+        #:param std_packet_rate: std packet rate
+        #:param std_byte_rate: std byte rate
         :param entropy_protocol: entropy of protocol
         :param entropy_dst_ip: entropy of dest ip
         :param entropy_src_port: entropy of src ip
@@ -54,13 +58,13 @@ class FeatureComposer:
         :type mean_duration: float
         :type mean_packet: float
         :type mean_num_of_bytes: float
-        :type mean_packet_rate: float
-        :type mean_byte_rate: float
+        #:type mean_packet_rate: float
+        #:type mean_byte_rate: float
         :type std_duration: float
         :type std_packet: float
         :type std_num_of_bytes: float
-        :type std_packet_rate: float
-        :type std_byte_rate: float
+        #:type std_packet_rate: float
+        #:type std_byte_rate: float
         :type entropy_protocol: float
         :type entropy_dst_ip: float
         :type entropy_src_port: float
@@ -75,22 +79,28 @@ class FeatureComposer:
         mean_duration = normalise(mean_duration, *feature_min_max.get('mean_duration'))
         mean_packet = normalise(mean_packet, *feature_min_max.get('mean_packet'))
         mean_num_of_bytes = normalise(mean_num_of_bytes, *feature_min_max.get('mean_num_of_bytes'))
-        mean_packet_rate = normalise(mean_packet_rate, *feature_min_max.get('mean_packet_rate'))
-        mean_byte_rate = normalise(mean_byte_rate, *feature_min_max.get('mean_byte_rate'))
+        #mean_packet_rate = normalise(mean_packet_rate, *feature_min_max.get('mean_packet_rate'))
+        #mean_byte_rate = normalise(mean_byte_rate, *feature_min_max.get('mean_byte_rate'))
         std_duration = normalise(std_duration, *feature_min_max.get('std_duration'))
         std_packet = normalise(std_packet, *feature_min_max.get('std_packet'))
         std_num_of_bytes = normalise(std_num_of_bytes, *feature_min_max.get('std_num_of_bytes'))
-        std_packet_rate = normalise(std_packet_rate, *feature_min_max.get('std_packet_rate'))
-        std_byte_rate = normalise(std_byte_rate, *feature_min_max.get('std_byte_rate'))
+        #std_packet_rate = normalise(std_packet_rate, *feature_min_max.get('std_packet_rate'))
+        #std_byte_rate = normalise(std_byte_rate, *feature_min_max.get('std_byte_rate'))
         entropy_protocol = normalise(entropy_protocol, *feature_min_max.get('entropy_protocol'))
         entropy_dst_ip = normalise(entropy_dst_ip, *feature_min_max.get('entropy_dst_ip'))
         entropy_src_port = normalise(entropy_src_port, *feature_min_max.get('entropy_src_port'))
         entropy_dst_port = normalise(entropy_dst_port, *feature_min_max.get('entropy_dst_port'))
         entropy_flags = normalise(entropy_flags, *feature_min_max.get('entropy_flags'))
-
+        """
         feature_arr = [
             mean_duration, mean_packet, mean_num_of_bytes, mean_packet_rate, mean_byte_rate, std_duration, std_packet,
             std_num_of_bytes, std_packet_rate, std_byte_rate, entropy_protocol, entropy_dst_ip, entropy_src_port,
+            entropy_dst_port, entropy_flags,
+        ]
+        """
+        feature_arr = [
+            mean_duration, mean_packet, mean_num_of_bytes, std_duration, std_packet,
+            std_num_of_bytes, entropy_protocol, entropy_dst_ip, entropy_src_port,
             entropy_dst_port, entropy_flags,
         ]
 
@@ -140,7 +150,7 @@ def main(train: str, test: str, target_train: str, target_test: str):
         'data_schema', [
             UnischemaField('time_window', np.str, (), ScalarCodec(StringType()), False),
             UnischemaField('src_ip', np.str, (), ScalarCodec(StringType()), False),
-            UnischemaField('feature', np.float32, (1, 69), CompressedNdarrayCodec(), False),
+            UnischemaField('feature', np.float32, (1, 75), CompressedNdarrayCodec(), False),
             UnischemaField('label', np.str, (), ScalarCodec(StringType()), True),
         ]
     )

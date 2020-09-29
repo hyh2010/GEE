@@ -18,29 +18,29 @@ Feature Extraction Class
 
 
 class FeatureExtractor:
-    def __init__(self, spark: SparkSession, df: pyspark.sql.dataframe, window_seconds: int = 3 * 60):
+    def __init__(self, spark: SparkSession, df: pyspark.sql.dataframe, window_seconds: int = 1):
         self.spark = spark
 
         # patch time window
         self.df = patch_time_windows(df=df, window_seconds=window_seconds)
 
         # extract packet rate
-        self.df = (
-            self.df
-                .withColumn('packet_rate', col('packet') / col('duration'))
-        )
+        #self.df = (
+            #self.df
+                #.withColumn('packet_rate', col('packet') / col('duration'))
+        #)
 
         # extract packet rate
-        self.df = (
-            self.df
-                .withColumn('packet_rate', col('packet') / col('duration'))
-        )
+        #self.df = (
+            #self.df
+                #.withColumn('packet_rate', col('packet') / col('duration'))
+        #)
 
         # extract byte rate
-        self.df = (
-            self.df
-                .withColumn('byte_rate', col('num_of_bytes') / col('duration'))
-        )
+        #self.df = (
+            #self.df
+                #.withColumn('byte_rate', col('num_of_bytes') / col('duration'))
+        #)
 
         # udf functions of extraction methods
         self.extract_num_flow_udf = pandas_udf(self.extract_num_flow, 'double')
@@ -195,13 +195,13 @@ class FeatureExtractor:
                 self.mean_udf('duration').alias('mean_duration'),
                 self.mean_udf('packet').alias('mean_packet'),
                 self.mean_udf('num_of_bytes').alias('mean_num_of_bytes'),
-                self.mean_udf('packet_rate').alias('mean_packet_rate'),
-                self.mean_udf('byte_rate').alias('mean_byte_rate'),
+                #self.mean_udf('packet_rate').alias('mean_packet_rate'),
+                #self.mean_udf('byte_rate').alias('mean_byte_rate'),
                 self.std_udf('duration').alias('std_duration'),
                 self.std_udf('packet').alias('std_packet'),
                 self.std_udf('num_of_bytes').alias('std_num_of_bytes'),
-                self.std_udf('packet_rate').alias('std_packet_rate'),
-                self.std_udf('byte_rate').alias('std_byte_rate'),
+                #self.std_udf('packet_rate').alias('std_packet_rate'),
+                #self.std_udf('byte_rate').alias('std_byte_rate'),
                 self.entropy_udf('protocol').alias('entropy_protocol'),
                 self.entropy_udf('dst_ip').alias('entropy_dst_ip'),
                 self.entropy_udf('src_port').alias('entropy_src_port'),
@@ -212,7 +212,7 @@ class FeatureExtractor:
                 self.build_label_udf('label').alias('label'),
             )
                 # filter out num_flow < 10
-                .filter((col('num_flow') >= 10))
+                #.filter((col('num_flow') >= 10))
                 # sort by time window and source ip
                 .orderBy('time_window', 'src_ip')
                 # drop num_flow
