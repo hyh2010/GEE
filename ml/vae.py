@@ -73,7 +73,7 @@ class Encoder(pl.LightningModule):
         self.fc = nn.Sequential(
             # layer 1
             nn.Linear(
-                in_features=69,
+                in_features=75,
                 out_features=512
             ),
             nn.ReLU(),
@@ -131,7 +131,7 @@ class Decoder(pl.LightningModule):
             # output
             nn.Linear(
                 in_features=512,
-                out_features=69
+                out_features=75
             ),
             nn.Sigmoid(),
         )
