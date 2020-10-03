@@ -150,7 +150,7 @@ def main(train: str, test: str, target_train: str, target_test: str):
         'data_schema', [
             UnischemaField('time_window', np.str, (), ScalarCodec(StringType()), False),
             UnischemaField('src_ip', np.str, (), ScalarCodec(StringType()), False),
-            UnischemaField('feature', np.float32, (1, 75), CompressedNdarrayCodec(), False),
+            UnischemaField('feature', np.float32, (1, 73), CompressedNdarrayCodec(), False),
             UnischemaField('label', np.str, (), ScalarCodec(StringType()), True),
         ]
     )
