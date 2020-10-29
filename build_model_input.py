@@ -131,11 +131,15 @@ class FeatureComposer:
 
 
 @click.command()
-@click.option('--train', help='path to the directory containing train feature parquet files', required=True)
-@click.option('--test', help='path to the directory containing test feature parquet files', required=True)
-@click.option('--target_train', help='path to the directory to persist train model input files', required=True)
-@click.option('--target_test', help='path to the directory to persist test model input files', required=True)
-def main(train: str, test: str, target_train: str, target_test: str):
+#@click.option('--train', help='path to the directory containing train feature parquet files', required=True)
+@click.option('--source', help='path to the directory containing feature parquet files', required=True)
+#@click.option('--test', help='path to the directory containing test feature parquet files', required=True)
+#@click.option('--target_train', help='path to the directory to persist train model input files', required=True)
+@click.option('--target', help='path to the directory to persist model input files', required=True)
+@click.option('--remove_malicious', help='remove positive samples', default=True, type=bool)
+#@click.option('--target_test', help='path to the directory to persist test model input files', required=True)
+#def main(train: str, test: str, target_train: str, target_test: str):
+def main(source: str, target: str, remove_malicious: bool):
     # initialise logger
     logger = logging.getLogger(__file__)
     logger.addHandler(logging.StreamHandler())
@@ -155,37 +159,53 @@ def main(train: str, test: str, target_train: str, target_test: str):
         ]
     )
 
-    # processing train
-    logger.info('Processing train parquet files')
+    # processing
+    logger.info('Processing parquet files')
     logger.info('Read parquet')
-    train_feature_df = spark.read.parquet(train)
+    feature_df = spark.read.parquet(source)
 
     logger.info('Composing features...')
-    train_input = FeatureComposer(spark, train_feature_df).transform(remove_malicious=True, remove_null_label=True)
+    input = FeatureComposer(spark, feature_df).transform(remove_malicious=remove_malicious, remove_null_label=True)
 
     logger.info('Changing schema...')
-    train_input = change_df_schema(spark, schema, train_input)
+    input = change_df_schema(spark, schema, input)
 
     logger.info('Persisting...')
-    save_parquet_for_petastorm_parquet(spark, train_input, target_train, schema)
+    save_parquet_for_petastorm_parquet(spark, input, target, schema)
 
-    logger.info('Train input done')
+    logger.info('Preprocessing input done')
+
+    # processing train
+    #logger.info('Processing train parquet files')
+    #logger.info('Read parquet')
+    #train_feature_df = spark.read.parquet(train)
+
+    #logger.info('Composing features...')
+    #train_input = FeatureComposer(spark, train_feature_df).transform(remove_malicious=True, remove_null_label=True)
+
+    #logger.info('Changing schema...')
+    #train_input = change_df_schema(spark, schema, train_input)
+
+    #logger.info('Persisting...')
+    #save_parquet_for_petastorm_parquet(spark, train_input, target_train, schema)
+
+    #logger.info('Train input done')
 
     # processing test
-    logger.info('Processing test parquet files')
-    logger.info('Read parquet')
-    test_feature_df = spark.read.parquet(test)
+    #logger.info('Processing test parquet files')
+    #logger.info('Read parquet')
+    #test_feature_df = spark.read.parquet(test)
 
-    logger.info('Composing features...')
-    test_input = FeatureComposer(spark, test_feature_df).transform(remove_malicious=False, remove_null_label=True)
+    #logger.info('Composing features...')
+    #test_input = FeatureComposer(spark, test_feature_df).transform(remove_malicious=False, remove_null_label=True)
 
-    logger.info('Changing schema...')
-    test_input = change_df_schema(spark, schema, test_input)
+    #logger.info('Changing schema...')
+    #test_input = change_df_schema(spark, schema, test_input)
 
-    logger.info('Persisting...')
-    save_parquet_for_petastorm_parquet(spark, test_input, target_test, schema)
+    #logger.info('Persisting...')
+    #save_parquet_for_petastorm_parquet(spark, test_input, target_test, schema)
 
-    logger.info('Test input done')
+    #logger.info('Test input done')
 
 
 if __name__ == '__main__':
