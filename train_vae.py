@@ -19,8 +19,9 @@ import tempfile
 @click.command()
 @click.option('-d', '--data_path', help='dir path containing model input parquet files', required=True)
 @click.option('-m', '--model_path', help='output model path', required=True)
+@click.option('-n', '--model_name', help='output model name', required=True)
 @click.option('--gpu', help='whether to use gpu', default=True, type=bool)
-def main(data_path: str, model_path: str, gpu: bool):
+def main(data_path: str, model_path: str, model_name: str, gpu: bool):
     if gpu:
         gpu = -1
     else:
@@ -36,11 +37,13 @@ def main(data_path: str, model_path: str, gpu: bool):
     # create tensorboard logdir
     #logdir = pathlib.Path(tempfile.mkdtemp())/"tensorboard_logs"
     #shutil.rmtree(logdir, ignore_errors=True)
-    logdir = pathlib.Path('/tmp/tmpedfqsh54/tensorboard_logs')/"tensorboard_logs"
+    logdir = pathlib.Path(model_path)/"tensorboard_logs"
     logger.info('Tensorboard dir: %s' % logdir) 
 
     # get number of cores
-    num_cores = psutil.cpu_count(logical=True)
+    #num_cores = psutil.cpu_count(logical=True)
+    num_cores = 8
+    print(num_cores)
     # load data loader
     reader = make_reader(
         Path(data_path).absolute().as_uri(), schema_fields=['feature'], reader_pool_type='process',
@@ -51,10 +54,8 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Initialise model...')
     # init model
-    #model = VAE()
-    model = AE()
-
-    logdir_vae = logdir/'vae'
+    model = VAE()
+    #model = AE()
 
     #data = next(iter(dataloader))
 
@@ -65,7 +66,7 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Start Training...')
 
-    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name='vae_mse_no_sigmoid_run2')
+    tb_logger = pl_loggers.TensorBoardLogger(str(logdir), name=model_name)
 
     # train
     trainer = Trainer(val_check_interval=100, max_epochs=50, gpus=gpu, logger=tb_logger)
@@ -74,8 +75,8 @@ def main(data_path: str, model_path: str, gpu: bool):
 
     logger.info('Persisting...')
     # persist model
-    Path(model_path).parent.mkdir(parents=True, exist_ok=True)
-    trainer.save_checkpoint(model_path)
+    Path(model_path).mkdir(parents=True, exist_ok=True)
+    trainer.save_checkpoint(model_path + '/' + model_name + '.model')
 
     logger.info('Done')
 
