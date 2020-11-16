@@ -21,7 +21,8 @@ import tempfile
 @click.option('-m', '--model_path', help='output model path', required=True)
 @click.option('-n', '--model_name', help='output model name', required=True)
 @click.option('--gpu', help='whether to use gpu', default=True, type=bool)
-def main(data_path: str, model_path: str, model_name: str, gpu: bool):
+@click.option('--vae', help='whether to use vae instead of ae', default=True, type=bool)
+def main(data_path: str, model_path: str, model_name: str, gpu: bool, vae: bool):
     if gpu:
         gpu = -1
     else:
@@ -54,8 +55,11 @@ def main(data_path: str, model_path: str, model_name: str, gpu: bool):
 
     logger.info('Initialise model...')
     # init model
-    model = VAE()
-    #model = AE()
+
+    if vae:
+        model = VAE()
+    else:
+        model = AE()
 
     #data = next(iter(dataloader))
 

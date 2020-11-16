@@ -11,22 +11,27 @@ class AE(pl.LightningModule):
         self.decoder = Decoder()
 
     def reparameterise(self, mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
-        return mu + eps * std
+        #std = torch.exp(0.5 * logvar)
+        #eps = torch.randn_like(std)
+        #return mu + eps * std
+        return mu
 
     def forward(self, x):
         mu, logvar = self.encoder(x)
         z = self.reparameterise(mu, logvar)
-        #z = mu
         return self.decoder(z), mu, logvar
 
     def loss_function(self, recon_x, x, mu, logvar):
-        loss = nn.MSELoss()
-        return loss(recon_x, x)
+        #BCE = F.binary_cross_entropy(recon_x, x, reduction='sum')
+        MSE = F.mse_loss(recon_x, x, reduction='sum')
+        #KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+
+        #return MSE + KLD
+        return MSE
 
     def training_step(self, batch, batch_idx):
 
+        x = batch['feature']
         if (self.global_step == 1):
             #  add computation graph
             self.logger.experiment.add_graph(self, x)
@@ -71,7 +76,7 @@ class Encoder(pl.LightningModule):
         self.fc = nn.Sequential(
             # layer 1
             nn.Linear(
-                in_features=69,
+                in_features=73,
                 out_features=512
             ),
             nn.ReLU(),
@@ -129,9 +134,9 @@ class Decoder(pl.LightningModule):
             # output
             nn.Linear(
                 in_features=512,
-                out_features=69
+                out_features=73
             ),
-            # nn.Sigmoid(),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
